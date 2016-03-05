@@ -5,6 +5,7 @@
 #include "parser_t.hpp"
 #include "player_e.hpp"
 #include "first_greedy_strategy.hpp"
+#include "square_pos_utils.hpp"
 
 // C++
 #include <iostream>
@@ -23,7 +24,7 @@ void bot_t::update_field(std::vector<int> fields) {
                             ? player_e::NONE
                             : id == d_id ? player_e::ME : player_e::OPPONENT;
 
-            d_table.make_owned_by(owner, square_pos_t::from_coords(i, j));
+            d_table.make_owned_by(owner, square_pos_utils::coords_to_pos(i, j));
         }
     }
 }
@@ -32,7 +33,7 @@ void bot_t::update_macroboard(std::vector<int> macroboard) {
     d_available.clear();
     for (auto i = 0u; i < macroboard.size(); ++i) {
         if (macroboard[i] == -1) {
-            d_available.emplace_back(static_cast<big_pos_e>(i));
+            d_available.emplace_back(square_pos_utils::coord_to_big_pos(i));
         }
     }
 }
@@ -40,7 +41,7 @@ void bot_t::update_macroboard(std::vector<int> macroboard) {
 void bot_t::make_move(int) {
     // Adjust strategy here
     auto sq_pos = first_greedy_strategy{d_table, d_available}.get_move();
-    auto pos = square_pos_t::to_coords(sq_pos);
+    auto pos = square_pos_utils::pos_to_coords(sq_pos);
 
     std::cout << "place_move " << pos.second << " " << pos.first << std::endl;
 }

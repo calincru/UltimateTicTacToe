@@ -3,7 +3,7 @@
 
 namespace tictactoe {
 
-enum class player_e: unsigned char {
+enum class player_e {
     NONE,
     ME,
     OPPONENT

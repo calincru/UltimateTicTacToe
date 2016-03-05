@@ -1,6 +1,11 @@
 // Self
 #include "first_greedy_strategy.hpp"
 
+// Project
+#include "player_e.hpp"
+#include "square_pos_utils.hpp"
+#include "utils.hpp"
+
 // C++
 #include <cstdlib>
 
@@ -14,16 +19,44 @@ first_greedy_strategy::first_greedy_strategy(
 }
 
 square_pos_t first_greedy_strategy::get_move() const {
-    auto big = d_avail[rand() % d_avail.size()];
-    auto avail = d_table.get_avail_moves_in(big);
+    auto filter = [&](auto pred) {
+        auto filtered = std::vector<square_pos_t>{};
 
-    while (!avail.size()) {
-        big = d_avail[rand() % d_avail.size()];
-        avail = d_table.get_avail_moves_in(big);
+        for (auto &game : d_avail) {
+            for (auto &pos : d_table.get_avail_moves_in(game)) {
+                auto big = square_pos_utils::small_to_big(pos);
+
+                if (pred(big)) {
+                    filtered.push_back({game, pos});
+                }
+            }
+        }
+
+        return filtered;
+    };
+    auto safest = [&](big_pos_e big) {
+        return d_table.is_playable(big)
+            && !d_table.is_about_to_win(player_e::OPPONENT, big);
+    };
+    auto safeish = [&](big_pos_e big) {
+        return d_table.is_playable(big);
+    };
+    auto dangerous = [&](big_pos_e) {
+        return true;
+    };
+
+    auto safest_next = filter(safest);
+    if (safest_next.size()) {
+        return safest_next[std::rand() % safest_next.size()];
     }
-    auto idx = rand() % avail.size();
 
-    return {big, avail[idx]};
+    auto safeish_next = filter(safeish);
+    if (safeish_next.size()) {
+        return safeish_next[std::rand() % safeish_next.size()];
+    }
+
+    auto dangerous_next = filter(dangerous);
+    return dangerous_next[std::rand() % dangerous_next.size()];
 }
 
 } // namespace tictactoe

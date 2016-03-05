@@ -30,7 +30,7 @@ class table_t {
     big_pos_set_t d_draws;
 
     // PRIVATE FUNCTIONS
-    bool check_owned_by(player_e player, big_pos_e pos) const;
+    bool check_won_by(player_e player, big_pos_e pos) const;
     bool check_draw(big_pos_e pos) const;
 
   public:
@@ -40,9 +40,12 @@ class table_t {
     // ACCESSORS
     player_e get_owner_of(square_pos_t pos) const;
     bool is_won_by(player_e player, big_pos_e pos) const;
+    bool is_about_to_win(player_e player, big_pos_e pos) const;
     bool is_draw(big_pos_e pos) const;
+    bool is_playable(big_pos_e pos) const;
     big_pos_set_t get_games_own_by(player_e player) const;
     big_pos_set_t get_draws() const;
+    big_pos_set_t get_playable() const;
     std::vector<small_pos_e> get_avail_moves_in(big_pos_e big) const;
 
     // MANIPULATORS

@@ -3,11 +3,11 @@
 
 // Project
 #include "strategy_base.hpp"
+#include "square_pos_t.hpp"
 
 namespace tictactoe {
 
 class first_greedy_strategy: public strategy_base {
-
   public:
     // CREATORS
     first_greedy_strategy(const table_t &table,

@@ -7,6 +7,7 @@ OBJ = $(subst src/,obj/,$(patsubst %.cpp,%.o,$(SRC)))
 
 CXXFLAGS = $(foreach idir, $(INCLUDE_DIRS), -I$(idir)) \
            -std=c++14 \
+           -Wall -Wextra -Werror \
            -g -DDEBUG
 
 .PHONY: build run clean
