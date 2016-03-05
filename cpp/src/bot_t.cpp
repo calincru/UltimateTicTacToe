@@ -24,7 +24,9 @@ void bot_t::update_field(std::vector<int> fields) {
                             ? player_e::NONE
                             : id == d_id ? player_e::ME : player_e::OPPONENT;
 
-            d_table.make_owned_by(owner, square_pos_utils::coords_to_pos(i, j));
+            if (owner != player_e::NONE)
+                d_table.make_owned_by(owner,
+                                      square_pos_utils::coords_to_pos(i, j));
         }
     }
 }
