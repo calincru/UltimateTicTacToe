@@ -75,45 +75,55 @@ bool table_t::is_won_by(player_e player, big_pos_e pos) const {
 }
 
 bool table_t::is_about_to_win(player_e player, big_pos_e pos) const {
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
+
+    auto score = [&](player_e p1, player_e p2, player_e p3) {
+        auto other = player == player_e::ME ? player_e::OPPONENT
+                                            : player_e::ME;
+
+        return (p1 == player) - (p1 == other)
+             + (p2 == player) - (p2 == other)
+             + (p3 == player) - (p2 == other);
+    };
         // Upper row
-    return ((d_board.at({pos, small_pos_e::UL}) == player) +
-            (d_board.at({pos, small_pos_e::UM}) == player) +
-            (d_board.at({pos, small_pos_e::UR}) == player)) == 2
+    return score(d_board.at({pos, small_pos_e::UL}),
+                 d_board.at({pos, small_pos_e::UM}),
+                 d_board.at({pos, small_pos_e::UR})) == 2
 
         // Middle row
-        || ((d_board.at({pos, small_pos_e::ML}) == player) +
-            (d_board.at({pos, small_pos_e::MM}) == player) +
-            (d_board.at({pos, small_pos_e::MR}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::ML}),
+                 d_board.at({pos, small_pos_e::MM}),
+                 d_board.at({pos, small_pos_e::MR})) == 2
 
         // Lower row
-        || ((d_board.at({pos, small_pos_e::LL}) == player) +
-            (d_board.at({pos, small_pos_e::LM}) == player) +
-            (d_board.at({pos, small_pos_e::LR}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::LL}),
+                 d_board.at({pos, small_pos_e::LM}),
+                 d_board.at({pos, small_pos_e::LR})) == 2
 
         // Left column
-        || ((d_board.at({pos, small_pos_e::UL}) == player) +
-            (d_board.at({pos, small_pos_e::ML}) == player) +
-            (d_board.at({pos, small_pos_e::LL}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::UL}),
+                 d_board.at({pos, small_pos_e::ML}),
+                 d_board.at({pos, small_pos_e::LL})) == 2
 
         // Middle column
-        || ((d_board.at({pos, small_pos_e::UM}) == player) +
-            (d_board.at({pos, small_pos_e::MM}) == player) +
-            (d_board.at({pos, small_pos_e::LM}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::UM}),
+                 d_board.at({pos, small_pos_e::MM}),
+                 d_board.at({pos, small_pos_e::LM})) == 2
 
         // Right column
-        || ((d_board.at({pos, small_pos_e::UR}) == player) +
-            (d_board.at({pos, small_pos_e::MR}) == player) +
-            (d_board.at({pos, small_pos_e::LR}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::UR}),
+                 d_board.at({pos, small_pos_e::MR}),
+                 d_board.at({pos, small_pos_e::LR})) == 2
 
         // UL - LR diagonal
-        || ((d_board.at({pos, small_pos_e::UL}) == player) +
-            (d_board.at({pos, small_pos_e::MM}) == player) +
-            (d_board.at({pos, small_pos_e::LR}) == player)) == 2
+        || score(d_board.at({pos, small_pos_e::UL}),
+                 d_board.at({pos, small_pos_e::MM}),
+                 d_board.at({pos, small_pos_e::LR})) == 2
 
         // UR - LL diagonal
-        || ((d_board.at({pos, small_pos_e::UL}) == player) +
-            (d_board.at({pos, small_pos_e::MM}) == player) +
-            (d_board.at({pos, small_pos_e::LR}) == player)) == 2;
+        || score(d_board.at({pos, small_pos_e::UL}),
+                 d_board.at({pos, small_pos_e::MM}),
+                 d_board.at({pos, small_pos_e::LR})) == 2;
 }
 
 bool table_t::is_draw(big_pos_e pos) const {
