@@ -15,7 +15,7 @@ namespace {
 
 // STATIC DATA
 static constexpr auto INF = std::numeric_limits<int>::max();
-static constexpr auto MAX_DEPTH = 1;
+static constexpr auto MAX_DEPTH = 6;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
@@ -24,8 +24,9 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                             int alpha, int beta, int depth) {
     if (depth == MAX_DEPTH) {
         auto my_score = heuristic_one{table, avail, player}.evaluate();
+        auto opponent_avail_moves = std::vector<big_pos_e>{};
         auto his_score
-            = heuristic_one{table, avail,
+            = heuristic_one{table, opponent_avail_moves,
                             player_utils::opponent(player)}.evaluate();
 
         return std::make_pair(my_score - his_score, square_pos_t{});
@@ -47,7 +48,7 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                        player_utils::opponent(player),
                                        -beta, -alpha, depth + 1);
 
-            if (-subtree_max.first > alpha) {
+            if (-subtree_max.first >= alpha) {
                 alpha = -subtree_max.first;
                 best_move = move;
             }
