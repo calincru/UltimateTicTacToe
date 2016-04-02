@@ -8,6 +8,7 @@ strategy_base::strategy_base(const table_t &table,
     : d_table{table}
     , d_avail{avail} {
     // Nothing to do
+    //
 }
 
 } // namespace tictactoe

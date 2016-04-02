@@ -36,7 +36,7 @@ square_pos_t first_greedy_strategy::get_move() const {
     };
     auto safest = [&](big_pos_e big) {
         return d_table.is_playable(big)
-            && !d_table.is_about_to_win(player_e::OPPONENT, big);
+            && !d_table.is_almost_won_by(player_e::OPPONENT, big);
     };
     auto safeish = [&](big_pos_e big) {
         return d_table.is_playable(big);

@@ -3,6 +3,7 @@
 
 // Project
 #include "square_pos_utils.hpp"
+#include "player_utils.hpp"
 #include "utils.hpp"
 
 namespace tictactoe {
@@ -49,9 +50,8 @@ bool table_t::check_won_by(player_e player, big_pos_e pos) const {
             d_board.at({pos, small_pos_e::LR}) == player);
 }
 
-bool table_t::check_draw(big_pos_e) const {
-    // TODO
-    return false;
+bool table_t::check_draw(big_pos_e pos) const {
+    return !can_win(player_e::ME, pos) && !can_win(player_e::OPPONENT, pos);
 }
 
 table_t::table_t()
@@ -74,7 +74,7 @@ bool table_t::is_won_by(player_e player, big_pos_e pos) const {
                                   : d_his.find(pos) != d_his.end();
 }
 
-bool table_t::is_about_to_win(player_e player, big_pos_e pos) const {
+bool table_t::is_almost_won_by(player_e player, big_pos_e pos) const {
     TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
 
     auto score = [&](player_e p1, player_e p2, player_e p3) {
@@ -136,7 +136,50 @@ bool table_t::is_playable(big_pos_e pos) const {
         && !is_draw(pos);
 }
 
-auto table_t::get_games_own_by(player_e player) const -> big_pos_set_t {
+bool table_t::can_win(player_e player, big_pos_e game) const {
+    auto opponent = player_utils::opponent(player);
+
+    return (d_board.at({game, small_pos_e::UL}) != opponent &&
+            d_board.at({game, small_pos_e::UM}) != opponent &&
+            d_board.at({game, small_pos_e::UR}) != opponent)
+
+        // Middle row
+        || (d_board.at({game, small_pos_e::ML}) != opponent &&
+            d_board.at({game, small_pos_e::MM}) != opponent &&
+            d_board.at({game, small_pos_e::MR}) != opponent)
+
+        // Lower row
+        || (d_board.at({game, small_pos_e::LL}) != opponent &&
+            d_board.at({game, small_pos_e::LM}) != opponent &&
+            d_board.at({game, small_pos_e::LR}) != opponent)
+
+        // Left column
+        || (d_board.at({game, small_pos_e::UL}) != opponent &&
+            d_board.at({game, small_pos_e::ML}) != opponent &&
+            d_board.at({game, small_pos_e::LL}) != opponent)
+
+        // Middle column
+        || (d_board.at({game, small_pos_e::UM}) != opponent &&
+            d_board.at({game, small_pos_e::MM}) != opponent &&
+            d_board.at({game, small_pos_e::LM}) != opponent)
+
+        // Right column
+        || (d_board.at({game, small_pos_e::UR}) != opponent &&
+            d_board.at({game, small_pos_e::MR}) != opponent &&
+            d_board.at({game, small_pos_e::LR}) != opponent)
+
+        // UL - LR diagonal
+        || (d_board.at({game, small_pos_e::UL}) != opponent &&
+            d_board.at({game, small_pos_e::MM}) != opponent &&
+            d_board.at({game, small_pos_e::LR}) != opponent)
+
+        // UR - LL diagonal
+        || (d_board.at({game, small_pos_e::UL}) != opponent &&
+            d_board.at({game, small_pos_e::MM}) != opponent &&
+            d_board.at({game, small_pos_e::LR}) != opponent);
+}
+
+auto table_t::get_games_won_by(player_e player) const -> big_pos_set_t {
     TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
     return player == player_e::ME ? d_mines : d_his;
 }
@@ -159,6 +202,20 @@ auto table_t::get_playable() const -> big_pos_set_t {
     return playable;
 }
 
+auto table_t::get_games_almost_won_by(player_e player) const -> big_pos_set_t {
+    auto almost_won = big_pos_set_t{};
+
+    for (auto i = 0; i < 9; ++i) {
+        auto pos = square_pos_utils::coord_to_big_pos(i);
+
+        if (is_almost_won_by(player, pos)) {
+            almost_won.emplace(pos);
+        }
+    }
+
+    return almost_won;
+}
+
 std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
     auto poses = std::vector<small_pos_e>{};
 
@@ -171,6 +228,24 @@ std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
     }
 
     return poses;
+}
+
+std::vector<big_pos_e> table_t::get_next_available(big_pos_e pos) const {
+    if (is_playable(pos)) {
+        return {pos};
+    }
+
+    auto next_available = std::vector<big_pos_e>{};
+
+    for (auto i = 0; i < 9; ++i) {
+        auto game = square_pos_utils::coord_to_big_pos(i);
+
+        if (game != pos && is_playable(game)) {
+            next_available.emplace_back(game);
+        }
+    }
+
+    return next_available;
 }
 
 void table_t::make_owned_by(player_e player, square_pos_t pos) {

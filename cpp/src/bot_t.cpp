@@ -4,7 +4,7 @@
 // Project
 #include "parser_t.hpp"
 #include "player_e.hpp"
-#include "first_greedy_strategy.hpp"
+#include "minimax_one.hpp"
 #include "square_pos_utils.hpp"
 
 // C++
@@ -42,7 +42,7 @@ void bot_t::update_macroboard(std::vector<int> macroboard) {
 
 void bot_t::make_move(int) {
     // Adjust strategy here
-    auto sq_pos = first_greedy_strategy{d_table, d_available}.get_move();
+    auto sq_pos = minimax_one{d_table, d_available}.get_move();
     auto pos = square_pos_utils::pos_to_coords(sq_pos);
 
     std::cout << "place_move " << pos.second << " " << pos.first << std::endl;
