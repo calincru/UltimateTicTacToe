@@ -5,9 +5,6 @@
 #include "square_pos_utils.hpp"
 #include "utils.hpp"
 
-// C++
-#include <array>
-
 #define SET_CONTAINS(set, value) (set.find(value) != set.end())
 
 namespace tictactoe {

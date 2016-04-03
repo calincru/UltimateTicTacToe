@@ -5,10 +5,6 @@
 #include "heuristic_one.hpp"
 #include "square_pos_utils.hpp"
 #include "player_utils.hpp"
-#include "utils.hpp"
-
-// C++
-#include <limits>
 
 namespace tictactoe {
 namespace {
