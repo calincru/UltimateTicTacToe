@@ -11,24 +11,34 @@ namespace {
 
 // STATIC DATA
 static constexpr auto INF = 0x3f3f3f3f;
-static constexpr auto MAX_DEPTH = 6;
+static constexpr auto MAX_DEPTH = 4;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
                                             std::vector<big_pos_e> avail,
                                             player_e player,
                                             int alpha, int beta, int depth) {
+    auto opponent = player_utils::opponent(player);
+    auto winner = table.get_winner();
+    auto best_move = square_pos_t{};
+
+    if (winner == player) {
+        alpha = INF;
+        goto _exit;
+    } else if (winner == opponent) {
+        alpha = -INF;
+        goto _exit;
+    }
+
     if (depth == MAX_DEPTH) {
         auto my_score = heuristic_one{table, avail, player}.evaluate();
         auto opponent_avail_moves = std::vector<big_pos_e>{};
         auto his_score
-            = heuristic_one{table, opponent_avail_moves,
-                            player_utils::opponent(player)}.evaluate();
+            = heuristic_one{table, opponent_avail_moves, opponent}.evaluate();
 
-        return std::make_pair(my_score - his_score, square_pos_t{});
+        alpha = my_score - his_score;
+        goto _exit;
     }
-
-    auto best_move = square_pos_t{};
 
     for (auto &game : avail) {
         for (auto &pos : table.get_avail_moves_in(game)) {
@@ -41,7 +51,7 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                         square_pos_utils::small_to_big(pos));
             auto subtree_max = negamax(std::move(table_cpy),
                                        std::move(next_avail),
-                                       player_utils::opponent(player),
+                                       opponent,
                                        -beta, -alpha, depth + 1);
 
             if (-subtree_max.first > alpha) {

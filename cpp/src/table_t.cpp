@@ -8,6 +8,48 @@
 
 namespace tictactoe {
 
+bool table_t::check_game_won_by(player_e player) const {
+        // Upper row
+    return (is_won_by(player, big_pos_e::UL) &&
+            is_won_by(player, big_pos_e::UM) &&
+            is_won_by(player, big_pos_e::UR))
+
+        // Middle row
+        || (is_won_by(player, big_pos_e::ML) &&
+            is_won_by(player, big_pos_e::MM) &&
+            is_won_by(player, big_pos_e::MR))
+
+        // Lower row
+        || (is_won_by(player, big_pos_e::LL) &&
+            is_won_by(player, big_pos_e::LM) &&
+            is_won_by(player, big_pos_e::LR))
+
+        // Left column
+        || (is_won_by(player, big_pos_e::UL) &&
+            is_won_by(player, big_pos_e::ML) &&
+            is_won_by(player, big_pos_e::LL))
+
+        // Middle column
+        || (is_won_by(player, big_pos_e::UM) &&
+            is_won_by(player, big_pos_e::MM) &&
+            is_won_by(player, big_pos_e::LM))
+
+        // Right column
+        || (is_won_by(player, big_pos_e::UR) &&
+            is_won_by(player, big_pos_e::MR) &&
+            is_won_by(player, big_pos_e::LR))
+
+        // UL - LR diagonal
+        || (is_won_by(player, big_pos_e::UL) &&
+            is_won_by(player, big_pos_e::MM) &&
+            is_won_by(player, big_pos_e::LR))
+
+        // UR - LL diagonal
+        || (is_won_by(player, big_pos_e::UR) &&
+            is_won_by(player, big_pos_e::MM) &&
+            is_won_by(player, big_pos_e::LL));
+};
+
 bool table_t::check_won_by(player_e player, big_pos_e pos) const {
         // Upper row
     return (d_board.at({pos, small_pos_e::UL}) == player &&
@@ -62,6 +104,17 @@ table_t::table_t()
                             player_e::NONE);
         }
     }
+}
+
+player_e table_t::get_winner() const {
+    if (check_game_won_by(player_e::ME)) {
+        return player_e::ME;
+    }
+    if (check_game_won_by(player_e::OPPONENT)) {
+        return player_e::ME;
+    }
+
+    return player_e::NONE;
 }
 
 player_e table_t::get_owner_of(square_pos_t pos) const {

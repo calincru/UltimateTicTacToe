@@ -14,7 +14,7 @@ namespace tictactoe {
 
 class heuristic_one: public heuristic_base {
     // PRIVATE TYPES
-    enum {
+    enum small_game_states {
         WON,
         ALMOST_WON,
         UNDECIDED,
