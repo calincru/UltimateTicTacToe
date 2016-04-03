@@ -39,21 +39,9 @@ int heuristic_one::score_almost_won_game(big_pos_e game) const {
 }
 
 int heuristic_one::score_undecided_game(big_pos_e game) const {
-    auto mine = 0;
-    auto his = 0;
-
-    for (auto i = 0; i < 9; ++i) {
-        auto pos = square_pos_t{game, square_pos_utils::coord_to_small_pos(i)};
-        auto owner = d_table.get_owner_of(pos);
-
-        if (owner == d_player) {
-            ++mine;
-        } else if (owner == d_opponent) {
-            ++his;
-        }
-    }
-
-    return (1 + (mine - his)/9.) * UNDECIDED_FACTOR;
+    // FIXME
+    UNUSED(game);
+    return UNDECIDED_FACTOR;
 }
 
 int heuristic_one::score_cannot_win_game(big_pos_e game) const {

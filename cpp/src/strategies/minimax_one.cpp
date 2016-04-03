@@ -14,8 +14,8 @@ namespace tictactoe {
 namespace {
 
 // STATIC DATA
-static constexpr auto INF = std::numeric_limits<int>::max();
-static constexpr auto MAX_DEPTH = 6;
+static constexpr auto INF = 0x3f3f3f3f;
+static constexpr auto MAX_DEPTH = 3;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
@@ -48,17 +48,17 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                        player_utils::opponent(player),
                                        -beta, -alpha, depth + 1);
 
-            if (-subtree_max.first >= alpha) {
+            if (-subtree_max.first > alpha) {
                 alpha = -subtree_max.first;
                 best_move = move;
             }
             if (alpha >= beta) {
-                break;
+                goto _exit;
             }
         }
     }
 
-    TTT_ASSERT(alpha != -INF);
+_exit:
     return std::make_pair(alpha, best_move);
 }
 
@@ -71,10 +71,7 @@ minimax_one::minimax_one(const table_t &table,
 }
 
 square_pos_t minimax_one::get_move() const {
-    return negamax(std::move(d_table),
-                   std::move(d_avail),
-                   player_e::ME,
-                   -INF, INF, 0).second;
+    return negamax(d_table, d_avail, player_e::ME, -INF, INF, 0).second;
 }
 
 } // namespace tictactoe

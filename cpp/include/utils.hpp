@@ -36,11 +36,11 @@ inline std::string comma_join(const std::vector<std::string> &elems) {
 
 #define UNUSED(a) (void)(&a)
 
-#ifdef DEBUG
+/* #ifdef DEBUG */
 # define TTT_ASSERT(assertion) assert(assertion)
-#else
-# define TTT_ASSERT(assertion)
-#endif
+/* #else */
+/* # define TTT_ASSERT(assertion) */
+/* #endif */
 
 } // namespace utils
 } // namespace tictactoe

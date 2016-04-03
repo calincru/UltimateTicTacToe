@@ -45,9 +45,9 @@ bool table_t::check_won_by(player_e player, big_pos_e pos) const {
             d_board.at({pos, small_pos_e::LR}) == player)
 
         // UR - LL diagonal
-        || (d_board.at({pos, small_pos_e::UL}) == player &&
+        || (d_board.at({pos, small_pos_e::UR}) == player &&
             d_board.at({pos, small_pos_e::MM}) == player &&
-            d_board.at({pos, small_pos_e::LR}) == player);
+            d_board.at({pos, small_pos_e::LL}) == player);
 }
 
 bool table_t::check_draw(big_pos_e pos) const {
@@ -83,7 +83,7 @@ bool table_t::is_almost_won_by(player_e player, big_pos_e pos) const {
 
         return (p1 == player) - (p1 == other)
              + (p2 == player) - (p2 == other)
-             + (p3 == player) - (p2 == other);
+             + (p3 == player) - (p3 == other);
     };
         // Upper row
     return score(d_board.at({pos, small_pos_e::UL}),
@@ -121,9 +121,9 @@ bool table_t::is_almost_won_by(player_e player, big_pos_e pos) const {
                  d_board.at({pos, small_pos_e::LR})) == 2
 
         // UR - LL diagonal
-        || score(d_board.at({pos, small_pos_e::UL}),
+        || score(d_board.at({pos, small_pos_e::UR}),
                  d_board.at({pos, small_pos_e::MM}),
-                 d_board.at({pos, small_pos_e::LR})) == 2;
+                 d_board.at({pos, small_pos_e::LL})) == 2;
 }
 
 bool table_t::is_draw(big_pos_e pos) const {
@@ -132,8 +132,7 @@ bool table_t::is_draw(big_pos_e pos) const {
 
 bool table_t::is_playable(big_pos_e pos) const {
     return !is_won_by(player_e::ME, pos)
-        && !is_won_by(player_e::OPPONENT, pos)
-        && !is_draw(pos);
+        && !is_won_by(player_e::OPPONENT, pos);
 }
 
 bool table_t::can_win(player_e player, big_pos_e game) const {
@@ -174,9 +173,9 @@ bool table_t::can_win(player_e player, big_pos_e game) const {
             d_board.at({game, small_pos_e::LR}) != opponent)
 
         // UR - LL diagonal
-        || (d_board.at({game, small_pos_e::UL}) != opponent &&
+        || (d_board.at({game, small_pos_e::UR}) != opponent &&
             d_board.at({game, small_pos_e::MM}) != opponent &&
-            d_board.at({game, small_pos_e::LR}) != opponent);
+            d_board.at({game, small_pos_e::LL}) != opponent);
 }
 
 auto table_t::get_games_won_by(player_e player) const -> big_pos_set_t {
@@ -219,6 +218,7 @@ auto table_t::get_games_almost_won_by(player_e player) const -> big_pos_set_t {
 std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
     auto poses = std::vector<small_pos_e>{};
 
+    TTT_ASSERT(is_playable(big));
     for (auto i = 0; i < 9; ++i) {
         auto small = square_pos_utils::coord_to_small_pos(i);
 
