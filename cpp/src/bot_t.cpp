@@ -20,13 +20,14 @@ void bot_t::update_field(std::vector<int> fields) {
     for (auto i = 0; i < 9; ++i) {
         for (auto j = 0; j < 9; ++j) {
             auto id = fields[i * 9 + j];
-            auto owner = id == 0
-                            ? player_e::NONE
-                            : id == d_id ? player_e::ME : player_e::OPPONENT;
+            auto owner = id == 0 ? player_e::NONE
+                                 : id == d_id ? player_e::ME
+                                              : player_e::OPPONENT;
 
-            if (owner != player_e::NONE)
+            if (owner != player_e::NONE) {
                 d_table.make_owned_by(owner,
                                       square_pos_utils::coords_to_pos(i, j));
+            }
         }
     }
 }

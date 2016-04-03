@@ -9,7 +9,7 @@
 namespace tictactoe {
 
 bool table_t::check_won_by(player_e player, big_pos_e pos) const {
-    // Upper row
+        // Upper row
     return (d_board.at({pos, small_pos_e::UL}) == player &&
             d_board.at({pos, small_pos_e::UM}) == player &&
             d_board.at({pos, small_pos_e::UR}) == player)
@@ -78,13 +78,13 @@ bool table_t::is_almost_won_by(player_e player, big_pos_e pos) const {
     TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
 
     auto score = [&](player_e p1, player_e p2, player_e p3) {
-        auto other = player == player_e::ME ? player_e::OPPONENT
-                                            : player_e::ME;
+        auto opponent = player_utils::opponent(player);
 
-        return (p1 == player) - (p1 == other)
-             + (p2 == player) - (p2 == other)
-             + (p3 == player) - (p3 == other);
+        return (p1 == player) - (p1 == opponent)
+             + (p2 == player) - (p2 == opponent)
+             + (p3 == player) - (p3 == opponent);
     };
+
         // Upper row
     return score(d_board.at({pos, small_pos_e::UL}),
                  d_board.at({pos, small_pos_e::UM}),

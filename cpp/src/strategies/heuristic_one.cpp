@@ -8,6 +8,8 @@
 // C++
 #include <array>
 
+#define SET_CONTAINS(set, value) (set.find(value) != set.end())
+
 namespace tictactoe {
 namespace {
     // STATIC DATA
@@ -22,53 +24,86 @@ int heuristic_one::score_available_moves() const {
     return d_avail.size() > 1 ? ANY_MOVE_TERM : 0;
 }
 
-int heuristic_one::score_won_game(big_pos_e game) const {
+int heuristic_one::score_won_game(big_pos_e game,
+                                  const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
+    UNUSED(games);
 
     return WON_FACTOR;
 }
 
-int heuristic_one::score_almost_won_game(big_pos_e game) const {
+int heuristic_one::score_almost_won_game(big_pos_e game,
+                                         const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
+    UNUSED(games);
 
     return ALMOST_WON_FACTOR;
 }
 
-int heuristic_one::score_undecided_game(big_pos_e game) const {
+int heuristic_one::score_undecided_game(big_pos_e game,
+                                        const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
+    UNUSED(games);
+
     return UNDECIDED_FACTOR;
 }
 
-int heuristic_one::score_cannot_win_game(big_pos_e game) const {
+int heuristic_one::score_cannot_win_game(big_pos_e game,
+                                         const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
+    UNUSED(games);
 
     return CANNOT_WIN_FACTOR;
 }
 
+auto heuristic_one::classify_games() const -> game_types_arr {
+    auto games = game_types_arr{};
+
+    for (auto i = 0; i < 9; ++i) {
+        auto game = square_pos_utils::coord_to_big_pos(i);
+
+        if (d_table.is_won_by(d_player, game)) {
+            games[WON].emplace(game);
+        } else if (d_table.is_won_by(d_opponent, game)) {
+            games[LOST].emplace(game);
+        } else if (d_table.is_almost_won_by(d_player, game)) {
+            games[ALMOST_WON].emplace(game);
+        } else if (!d_table.can_win(d_player, game)) {
+            games[CANNOT_WIN].emplace(game);
+        } else {
+            games[UNDECIDED].emplace(game);
+        }
+    }
+
+    return games;
+}
+
 int heuristic_one::score_games_in_line(big_pos_e game1,
                                        big_pos_e game2,
-                                       big_pos_e game3) const {
-    if (d_table.is_won_by(d_opponent, game1)
-        || d_table.is_won_by(d_opponent, game2)
-        || d_table.is_won_by(d_opponent, game3)) {
+                                       big_pos_e game3,
+                                       const game_types_arr &games) const {
+    if (SET_CONTAINS(games[LOST], game1)
+        || SET_CONTAINS(games[LOST], game2)
+        || SET_CONTAINS(games[LOST], game3)) {
         return 0;
     }
 
     auto score_game = [&](big_pos_e game) {
         auto score = 0;
 
-        if (d_table.is_won_by(d_player, game)) {
-            score += score_won_game(game);
-        } else if (d_table.is_almost_won_by(d_player, game)) {
-            score += score_almost_won_game(game);
-        } else if (!d_table.can_win(d_player, game)) {
-            score += score_cannot_win_game(game);
+        if (SET_CONTAINS(games[WON], game)) {
+            score += score_won_game(game, games);
+        } else if (SET_CONTAINS(games[ALMOST_WON], game)) {
+            score += score_almost_won_game(game, games);
+        } else if (SET_CONTAINS(games[CANNOT_WIN], game)) {
+            score += score_cannot_win_game(game, games);
         } else {
-            score += score_undecided_game(game);
+            TTT_ASSERT(SET_CONTAINS(games[UNDECIDED], game));
+            score += score_undecided_game(game, games);
         }
 
         return score;
@@ -88,6 +123,7 @@ heuristic_one::heuristic_one(const table_t &table,
 }
 
 int heuristic_one::evaluate() const {
+    auto games = classify_games();
     auto score = 0;
 
     for (auto i = 0; i < 3; ++i) {
@@ -95,14 +131,16 @@ int heuristic_one::evaluate() const {
         score += score_games_in_line(
                 square_pos_utils::coord_to_big_pos(i),
                 square_pos_utils::coord_to_big_pos(i + 3),
-                square_pos_utils::coord_to_big_pos(i + 6)
+                square_pos_utils::coord_to_big_pos(i + 6),
+                games
         );
 
         // Rows
         score += score_games_in_line(
                 square_pos_utils::coord_to_big_pos(i * 3),
                 square_pos_utils::coord_to_big_pos(i * 3 + 1),
-                square_pos_utils::coord_to_big_pos(i * 3 + 2)
+                square_pos_utils::coord_to_big_pos(i * 3 + 2),
+                games
         );
 
     }
@@ -110,12 +148,14 @@ int heuristic_one::evaluate() const {
     score += score_games_in_line(
             square_pos_utils::coord_to_big_pos(0),
             square_pos_utils::coord_to_big_pos(4),
-            square_pos_utils::coord_to_big_pos(8)
+            square_pos_utils::coord_to_big_pos(8),
+            games
     );
     score += score_games_in_line(
             square_pos_utils::coord_to_big_pos(2),
             square_pos_utils::coord_to_big_pos(4),
-            square_pos_utils::coord_to_big_pos(6)
+            square_pos_utils::coord_to_big_pos(6),
+            games
     );
 
     return score;
