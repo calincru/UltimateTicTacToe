@@ -111,7 +111,7 @@ player_e table_t::get_winner() const {
         return player_e::ME;
     }
     if (check_game_won_by(player_e::OPPONENT)) {
-        return player_e::ME;
+        return player_e::OPPONENT;
     }
 
     return player_e::NONE;
