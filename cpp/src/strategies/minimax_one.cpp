@@ -11,7 +11,7 @@ namespace {
 
 // STATIC DATA
 static constexpr auto INF = 0x3f3f3f3f;
-static constexpr auto MAX_DEPTH = 4;
+static constexpr auto MAX_DEPTH = 3;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
@@ -19,14 +19,18 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                             player_e player,
                                             int alpha, int beta, int depth) {
     auto opponent = player_utils::opponent(player);
-    auto winner = table.get_winner();
+    auto finished = table.is_finished();
     auto best_move = square_pos_t{};
 
-    if (winner == player) {
-        alpha = INF;
-        goto _exit;
-    } else if (winner == opponent) {
-        alpha = -INF;
+    if (finished.first) {
+        if (finished.second == player) {
+            alpha = INF;
+        } else if (finished.second == opponent) {
+            alpha = -INF;
+        } else {
+            alpha = 0;
+        }
+
         goto _exit;
     }
 

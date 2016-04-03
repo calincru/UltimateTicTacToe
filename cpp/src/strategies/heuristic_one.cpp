@@ -63,13 +63,13 @@ auto heuristic_one::classify_games() const -> game_types_arr {
     for (auto i = 0; i < 9; ++i) {
         auto game = square_pos_utils::coord_to_big_pos(i);
 
-        if (d_table.is_won_by(d_player, game)) {
+        if (d_table.is_small_won_by(d_player, game)) {
             games[WON].emplace(game);
-        } else if (d_table.is_won_by(d_opponent, game)) {
+        } else if (d_table.is_small_won_by(d_opponent, game)) {
             games[LOST].emplace(game);
-        } else if (d_table.is_almost_won_by(d_player, game)) {
+        } else if (d_table.is_small_almost_won_by(d_player, game)) {
             games[ALMOST_WON].emplace(game);
-        } else if (!d_table.can_win(d_player, game)) {
+        } else if (!d_table.can_win_small(d_player, game)) {
             games[CANNOT_WIN].emplace(game);
         } else {
             games[UNDECIDED].emplace(game);

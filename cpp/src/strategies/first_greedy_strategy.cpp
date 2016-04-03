@@ -35,11 +35,11 @@ square_pos_t first_greedy_strategy::get_move() const {
         return filtered;
     };
     auto safest = [&](big_pos_e big) {
-        return d_table.is_playable(big)
-            && !d_table.is_almost_won_by(player_e::OPPONENT, big);
+        return d_table.is_small_playable(big)
+            && !d_table.is_small_almost_won_by(player_e::OPPONENT, big);
     };
     auto safeish = [&](big_pos_e big) {
-        return d_table.is_playable(big);
+        return d_table.is_small_playable(big);
     };
     auto dangerous = [&](big_pos_e) {
         return true;

@@ -27,31 +27,28 @@ class table_t {
     board_t d_board;
     big_pos_set_t d_mines;
     big_pos_set_t d_his;
-    big_pos_set_t d_draws;
 
     // PRIVATE FUNCTIONS
     bool check_game_won_by(player_e player) const;
-    bool check_won_by(player_e player, big_pos_e pos) const;
-    bool check_draw(big_pos_e pos) const;
+    bool check_game_can_win(player_e player) const;
+    bool check_small_won_by(player_e player, big_pos_e pos) const;
 
   public:
     // CREATORS
     table_t();
 
     // ACCESSORS
-    player_e get_winner() const;
+    std::pair<bool, player_e> is_finished() const;
+
     player_e get_owner_of(square_pos_t pos) const;
+    bool is_small_won_by(player_e player, big_pos_e pos) const;
+    bool is_small_almost_won_by(player_e player, big_pos_e pos) const;
+    bool is_small_playable(big_pos_e pos) const;
+    bool can_win_small(player_e player, big_pos_e game) const;
 
-    bool is_won_by(player_e player, big_pos_e pos) const;
-    bool is_almost_won_by(player_e player, big_pos_e pos) const;
-    bool is_draw(big_pos_e pos) const;
-    bool is_playable(big_pos_e pos) const;
-    bool can_win(player_e player, big_pos_e game) const;
-
-    big_pos_set_t get_games_won_by(player_e player) const;
-    big_pos_set_t get_games_almost_won_by(player_e player) const;
-    big_pos_set_t get_draws() const;
-    big_pos_set_t get_playable() const;
+    big_pos_set_t get_smalls_won_by(player_e player) const;
+    big_pos_set_t get_smalls_almost_won_by(player_e player) const;
+    big_pos_set_t get_smalls_playable() const;
 
     std::vector<small_pos_e> get_avail_moves_in(big_pos_e big) const;
     std::vector<big_pos_e> get_next_available(big_pos_e pos) const;
