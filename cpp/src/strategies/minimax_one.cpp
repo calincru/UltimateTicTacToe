@@ -11,7 +11,7 @@ namespace {
 
 // STATIC DATA
 static constexpr auto INF = 0x3f3f3f3f;
-static constexpr auto MAX_DEPTH = 3;
+static constexpr auto MAX_DEPTH = 4;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
@@ -58,7 +58,7 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                        opponent,
                                        -beta, -alpha, depth + 1);
 
-            if (-subtree_max.first > alpha) {
+            if (alpha == -INF || -subtree_max.first > alpha) {
                 alpha = -subtree_max.first;
                 best_move = move;
             }
