@@ -10,14 +10,12 @@
 
 namespace tictactoe {
 namespace {
-
-// STATIC DATA
-static constexpr auto WON_FACTOR = 10000;
-static constexpr auto ANY_MOVE_TERM = 3 * WON_FACTOR - 1;
-static constexpr auto ALMOST_WON_FACTOR = 1000;
-static constexpr auto UNDECIDED_FACTOR = 100;
-static constexpr auto CANNOT_WIN_FACTOR = 10;
-
+    // STATIC DATA
+    static constexpr auto WON_FACTOR = 10000;
+    static constexpr auto ANY_MOVE_TERM = 3 * WON_FACTOR - 1;
+    static constexpr auto ALMOST_WON_FACTOR = 1000;
+    static constexpr auto UNDECIDED_FACTOR = 100;
+    static constexpr auto CANNOT_WIN_FACTOR = 10;
 } // namespace {
 
 int heuristic_one::score_available_moves() const {
