@@ -6,6 +6,9 @@
 #include "player_utils.hpp"
 #include "utils.hpp"
 
+// C++
+#include <algorithm>
+
 namespace tictactoe {
 
 bool table_t::check_game_won_by(player_e player) const {
@@ -312,6 +315,7 @@ std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
             poses.emplace_back(small);
         }
     }
+    std::random_shuffle(poses.begin(), poses.end());
 
     return poses;
 }
@@ -330,6 +334,7 @@ std::vector<big_pos_e> table_t::get_next_available(big_pos_e pos) const {
             next_available.emplace_back(game);
         }
     }
+    std::random_shuffle(next_available.begin(), next_available.end());
 
     return next_available;
 }

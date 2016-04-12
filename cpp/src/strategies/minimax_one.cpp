@@ -11,7 +11,7 @@ namespace {
 
 // STATIC DATA
 static constexpr auto INF = 0x3f3f3f3f;
-static constexpr auto MAX_DEPTH = 4;
+static constexpr auto MAX_DEPTH = 2;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
