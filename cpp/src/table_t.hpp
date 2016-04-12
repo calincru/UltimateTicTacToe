@@ -30,7 +30,7 @@ class table_t {
 
     // PRIVATE FUNCTIONS
     bool check_game_won_by(player_e player) const;
-    bool check_game_can_win(player_e player) const;
+    bool check_game_is_draw() const;
     bool check_small_won_by(player_e player, big_pos_e pos) const;
 
   public:

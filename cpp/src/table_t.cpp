@@ -53,48 +53,8 @@ bool table_t::check_game_won_by(player_e player) const {
             is_small_won_by(player, big_pos_e::LL));
 };
 
-bool table_t::check_game_can_win(player_e player) const {
-    auto opponent = player_utils::opponent(player);
-
-        // Upper row
-    return (!is_small_won_by(opponent, big_pos_e::UL) &&
-            !is_small_won_by(opponent, big_pos_e::UM) &&
-            !is_small_won_by(opponent, big_pos_e::UR))
-
-        // Middle row
-        || (!is_small_won_by(opponent, big_pos_e::ML) &&
-            !is_small_won_by(opponent, big_pos_e::MM) &&
-            !is_small_won_by(opponent, big_pos_e::MR))
-
-        // Lower row
-        || (!is_small_won_by(opponent, big_pos_e::LL) &&
-            !is_small_won_by(opponent, big_pos_e::LM) &&
-            !is_small_won_by(opponent, big_pos_e::LR))
-
-        // Left column
-        || (!is_small_won_by(opponent, big_pos_e::UL) &&
-            !is_small_won_by(opponent, big_pos_e::ML) &&
-            !is_small_won_by(opponent, big_pos_e::LL))
-
-        // Middle column
-        || (!is_small_won_by(opponent, big_pos_e::UM) &&
-            !is_small_won_by(opponent, big_pos_e::MM) &&
-            !is_small_won_by(opponent, big_pos_e::LM))
-
-        // Right column
-        || (!is_small_won_by(opponent, big_pos_e::UR) &&
-            !is_small_won_by(opponent, big_pos_e::MR) &&
-            !is_small_won_by(opponent, big_pos_e::LR))
-
-        // UL - LR diagonal
-        || (!is_small_won_by(opponent, big_pos_e::UL) &&
-            !is_small_won_by(opponent, big_pos_e::MM) &&
-            !is_small_won_by(opponent, big_pos_e::LR))
-
-        // UR - LL diagonal
-        || (!is_small_won_by(opponent, big_pos_e::UR) &&
-            !is_small_won_by(opponent, big_pos_e::MM) &&
-            !is_small_won_by(opponent, big_pos_e::LL));
+bool table_t::check_game_is_draw() const {
+    return d_mines.size() + d_his.size() == 9;
 }
 
 bool table_t::check_small_won_by(player_e player, big_pos_e pos) const {
@@ -157,8 +117,7 @@ std::pair<bool, player_e> table_t::is_finished() const {
         return {true, player_e::OPPONENT};
     }
 
-    return {!check_game_can_win(player_e::ME) &&
-            !check_game_can_win(player_e::OPPONENT), player_e::NONE};
+    return {check_game_is_draw(), player_e::NONE};
 }
 
 player_e table_t::get_owner_of(square_pos_t pos) const {
