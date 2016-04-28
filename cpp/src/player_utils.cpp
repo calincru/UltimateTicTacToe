@@ -7,7 +7,8 @@
 namespace tictactoe {
 
 player_e player_utils::opponent(player_e player) {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
+               "opponent precondition");
     return player == player_e::OPPONENT ? player_e::ME
                                         : player_e::OPPONENT;
 }

@@ -5,13 +5,13 @@
 #include "heuristic_one.hpp"
 #include "square_pos_utils.hpp"
 #include "player_utils.hpp"
+#include "globals.hpp"
 
 namespace tictactoe {
 namespace {
 
 // STATIC DATA
-static constexpr auto INF = 0x3f3f3f3f;
-static constexpr auto MAX_DEPTH = 2;
+static constexpr auto MAX_DEPTH = 5;
 
 // STATIC FUNCTIONS
 static std::pair<int, square_pos_t> negamax(table_t table,
@@ -75,8 +75,9 @@ _exit:
 } // namespace {
 
 minimax_one::minimax_one(const table_t &table,
-                         const std::vector<big_pos_e> &avail)
-    : strategy_base{table, avail} {
+                         const std::vector<big_pos_e> &avail,
+                         int current_round)
+    : strategy_base{table, avail, current_round} {
     // Nothing to do
 }
 

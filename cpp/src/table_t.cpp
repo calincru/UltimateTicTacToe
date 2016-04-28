@@ -6,9 +6,6 @@
 #include "player_utils.hpp"
 #include "utils.hpp"
 
-// C++
-#include <algorithm>
-
 namespace tictactoe {
 
 bool table_t::check_game_won_by(player_e player) const {
@@ -125,13 +122,15 @@ player_e table_t::get_owner_of(square_pos_t pos) const {
 }
 
 bool table_t::is_small_won_by(player_e player, big_pos_e pos) const {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
+               "is_small_won_by precondition");
     return player == player_e::ME ? d_mines.find(pos) != d_mines.end()
                                   : d_his.find(pos) != d_his.end();
 }
 
 bool table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
+               "is_small_almost_won_by precondition");
 
     auto score = [&](player_e p1, player_e p2, player_e p3) {
         auto opponent = player_utils::opponent(player);
@@ -231,7 +230,8 @@ bool table_t::can_win_small(player_e player, big_pos_e game) const {
 }
 
 auto table_t::get_smalls_won_by(player_e player) const -> big_pos_set_t {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT);
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
+               "get_smalls_won_by precondition");
     return player == player_e::ME ? d_mines : d_his;
 }
 
@@ -266,7 +266,7 @@ auto table_t::get_smalls_almost_won_by(player_e player) const -> big_pos_set_t {
 std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
     auto poses = std::vector<small_pos_e>{};
 
-    TTT_ASSERT(is_small_playable(big));
+    TTT_ASSERT(is_small_playable(big), "get_avail_moves_in precondition");
     for (auto i = 0; i < 9; ++i) {
         auto small = square_pos_utils::coord_to_small_pos(i);
 
@@ -274,7 +274,6 @@ std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {
             poses.emplace_back(small);
         }
     }
-    std::random_shuffle(poses.begin(), poses.end());
 
     return poses;
 }
@@ -293,7 +292,6 @@ std::vector<big_pos_e> table_t::get_next_available(big_pos_e pos) const {
             next_available.emplace_back(game);
         }
     }
-    std::random_shuffle(next_available.begin(), next_available.end());
 
     return next_available;
 }

@@ -4,3 +4,6 @@
 obj/
 Generic.tar.gz
 ab_bot
+
+perf.data
+perf.data.old

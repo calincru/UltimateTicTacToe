@@ -5,6 +5,7 @@
 #include "boost/noncopyable.hpp"
 #include "table_t.hpp"
 #include "square_pos_t.hpp"
+#include "globals.hpp"
 
 // C++
 #include <vector>
@@ -13,8 +14,6 @@ namespace tictactoe {
 
 class bot_t: boost::noncopyable {
     // PRIVATE DATA
-    int d_timebank;
-    int d_roundtime;
     int d_id;
     int d_current_round;
 
@@ -26,8 +25,8 @@ class bot_t: boost::noncopyable {
     void play();
 
     // Interface to the parser
-    void set_timebank(int ms) { d_timebank = ms; }
-    void set_time_per_move(int ms) { d_roundtime = ms; }
+    void set_timebank(int ms) { TTT_ASSERT(ms == TIMEBANK, "timebank"); }
+    void set_time_per_move(int ms) { TTT_ASSERT(ms == TIME_PER_ROUND, "tpr"); }
     void set_id(int id) { d_id = id; }
     void set_current_round(int round) { d_current_round = round; }
     void update_field(std::vector<int> fields);

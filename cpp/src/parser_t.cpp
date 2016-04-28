@@ -79,7 +79,7 @@ void parser_t::parse_input() {
             int time;
 
             iss >> what >> time;
-            TTT_ASSERT(what == "move");
+            TTT_ASSERT(what == "move", "parser invariant");
 
             d_bot.make_move(time);
         }

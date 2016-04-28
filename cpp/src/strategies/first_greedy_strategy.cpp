@@ -13,8 +13,9 @@ namespace tictactoe {
 
 first_greedy_strategy::first_greedy_strategy(
         const table_t &table,
-        const std::vector<big_pos_e> &avail)
-    : strategy_base{table, avail} {
+        const std::vector<big_pos_e> &avail,
+        int current_round)
+    : strategy_base{table, avail, current_round} {
     // Nothing to do
 }
 

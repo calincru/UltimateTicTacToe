@@ -1,5 +1,5 @@
 // Self
-#include "heuristic_one.hpp"
+#include "heuristic_two.hpp"
 
 // Project
 #include "square_pos_utils.hpp"
@@ -17,11 +17,11 @@ namespace {
     static constexpr auto CANNOT_WIN_FACTOR = 10;
 } // namespace {
 
-int heuristic_one::score_available_moves() const {
+int heuristic_two::score_available_moves() const {
     return d_avail.size() > 1 ? ANY_MOVE_TERM : 0;
 }
 
-int heuristic_one::score_won_game(big_pos_e game,
+int heuristic_two::score_won_game(big_pos_e game,
                                   const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
@@ -30,7 +30,7 @@ int heuristic_one::score_won_game(big_pos_e game,
     return WON_FACTOR;
 }
 
-int heuristic_one::score_almost_won_game(big_pos_e game,
+int heuristic_two::score_almost_won_game(big_pos_e game,
                                          const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
@@ -39,7 +39,7 @@ int heuristic_one::score_almost_won_game(big_pos_e game,
     return ALMOST_WON_FACTOR;
 }
 
-int heuristic_one::score_undecided_game(big_pos_e game,
+int heuristic_two::score_undecided_game(big_pos_e game,
                                         const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
@@ -48,7 +48,7 @@ int heuristic_one::score_undecided_game(big_pos_e game,
     return UNDECIDED_FACTOR;
 }
 
-int heuristic_one::score_cannot_win_game(big_pos_e game,
+int heuristic_two::score_cannot_win_game(big_pos_e game,
                                          const game_types_arr &games) const {
     // FIXME
     UNUSED(game);
@@ -57,7 +57,7 @@ int heuristic_one::score_cannot_win_game(big_pos_e game,
     return CANNOT_WIN_FACTOR;
 }
 
-auto heuristic_one::classify_games() const -> game_types_arr {
+auto heuristic_two::classify_games() const -> game_types_arr {
     auto games = game_types_arr{};
 
     for (auto i = 0; i < 9; ++i) {
@@ -79,7 +79,7 @@ auto heuristic_one::classify_games() const -> game_types_arr {
     return games;
 }
 
-int heuristic_one::score_games_in_line(big_pos_e game1,
+int heuristic_two::score_games_in_line(big_pos_e game1,
                                        big_pos_e game2,
                                        big_pos_e game3,
                                        const game_types_arr &games) const {
@@ -112,14 +112,14 @@ int heuristic_one::score_games_in_line(big_pos_e game1,
          + score_game(game3);
 }
 
-heuristic_one::heuristic_one(const table_t &table,
+heuristic_two::heuristic_two(const table_t &table,
                              const std::vector<big_pos_e> &avail,
                              player_e player)
     : heuristic_base{table, avail, player} {
     // Nothing to do
 }
 
-int heuristic_one::evaluate() const {
+int heuristic_two::evaluate() const {
     auto games = classify_games();
     auto score = 0;
 

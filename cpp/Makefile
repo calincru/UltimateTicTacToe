@@ -5,7 +5,7 @@ HEADERS = $(wildcard src/*.h)
 SRC = $(wildcard src/*.cpp) $(wildcard ./src/strategies/*.cpp)
 OBJ = $(subst src/,obj/,$(patsubst %.cpp,%.o,$(SRC)))
 
-CXXFLAGS = $(foreach idir, $(INCLUDE_DIRS), -I$(idir)) \
+CXXFLAGS = $(foreach idir, $(INCLUDE_DIRS), -I$(idir)) -O \
            -std=c++14 \
            -Wall -Wextra -Werror \
            -g -DDEBUG

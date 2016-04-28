@@ -19,12 +19,12 @@ int square_pos_utils::pos_to_coord(big_pos_e big) {
 #endif
 
 small_pos_e square_pos_utils::coord_to_small_pos(int coord) {
-    TTT_ASSERT(coord >= 0 && coord < 9);
+    TTT_ASSERT(coord >= 0 && coord < 9, "coord_to_small_pos precondition");
     return static_cast<small_pos_e>(coord);
 }
 
 big_pos_e square_pos_utils::coord_to_big_pos(int coord) {
-    TTT_ASSERT(coord >= 0 && coord < 9);
+    TTT_ASSERT(coord >= 0 && coord < 9, "coord_to_big_pos precondition");
     return static_cast<big_pos_e>(coord);
 }
 
