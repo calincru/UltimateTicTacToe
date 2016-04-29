@@ -6,15 +6,18 @@
 #include "utils.hpp"
 #include "globals.hpp"
 
+// C++
+#include <algorithm>
+
 #define SET_CONTAINS(set, value) (set.find(value) != set.end())
 
 namespace tictactoe {
 namespace {
     // STATIC DATA
-    static constexpr auto WON_FACTOR = 10000;
-    static constexpr auto ALMOST_WON_FACTOR = 1000;
-    static constexpr auto UNDECIDED_FACTOR = 100;
-    static constexpr auto CANNOT_WIN_FACTOR = 10;
+    static constexpr auto WON_FACTOR = 1000;
+    static constexpr auto ALMOST_WON_FACTOR = 100;
+    static constexpr auto UNDECIDED_FACTOR = 10;
+    static constexpr auto CANNOT_WIN_FACTOR = -10;
 } // namespace {
 
 ///
@@ -169,18 +172,49 @@ int heuristic_two::score_and_classify_games(game_types_arr &games) const {
 }
 
 ///
-// FIXME Adjust per winning line (row, column, diagonal) score here.
+// Adjust per winning line (row, column, diagonal) score here.
 ///
 int heuristic_two::score_games_in_line(big_pos_e game1,
                                        big_pos_e game2,
                                        big_pos_e game3,
                                        const game_types_arr &games) const {
-    UNUSED(game1);
-    UNUSED(game2);
-    UNUSED(game3);
-    UNUSED(games);
+    int won = 0;
+    int almost_won = 0;
+    int lost = 0;
+    int cannot_win = 0;
 
-    return 0;
+    auto count_f = [&](big_pos_e game) {
+        if (SET_CONTAINS(games[WON], game)) {
+            ++won;
+        } else if (SET_CONTAINS(games[ALMOST_WON], game)) {
+            ++almost_won;
+        } else if (SET_CONTAINS(games[LOST], game)) {
+            ++lost;
+        } else if (SET_CONTAINS(games[CANNOT_WIN], game)) {
+            ++cannot_win;
+        }
+    };
+    count_f(game1);
+    count_f(game2);
+    count_f(game3);
+
+    auto endorsement = 0;
+
+    if (lost > 0) {
+        if (won == 0) {
+            endorsement = -lost - 1;
+        } else {
+            endorsement = -lost;
+        }
+    } else if (won > 0 && cannot_win == 0) {
+        if (almost_won > 0) {
+            endorsement = won + 1;
+        } else {
+            endorsement = won;
+        }
+    }
+
+    return endorsement * WON_FACTOR;
 }
 
 heuristic_two::heuristic_two(const table_t &table,
