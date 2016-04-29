@@ -14,7 +14,8 @@ namespace tictactoe {
 namespace {
 
 // STATIC DATA
-static constexpr auto STARTING_DEPTH = 5;
+static constexpr auto STARTING_DEPTH = 4;
+static constexpr auto DRAW_SCORE = 1;
 
 // PRIVATE TYPES
 struct minmax_ret_t {
@@ -50,7 +51,7 @@ static minmax_ret_t negamax(table_t table,
         } else if (finished.second == opponent) {
             alpha = -INF;
         } else {
-            alpha = 0;
+            alpha = DRAW_SCORE;
         }
 
         goto return_score;
@@ -88,7 +89,7 @@ static minmax_ret_t negamax(table_t table,
                 goto timeout;
             }
 
-            if (alpha == -INF || -subtree_ret.score > alpha) {
+            if (-subtree_ret.score > alpha) {
                 alpha = -subtree_ret.score;
                 best_move = move;
             }
@@ -108,11 +109,22 @@ timeout:
 } // namespace {
 
 ///
-// The time allowed is an arithemtic progression with ratio 22, which allows a
-// maximum of 30 rounds.
+// The time allowed is an arithemtic progression with ratio 20, which allows a
+// maximum of 34 rounds.
+//
+// FIXME Experimenting
 ///
 int minimax_two::get_time_limit() const {
-    return TIME_PER_ROUND + (d_current_round - 1) * 22;
+    /* return TIME_PER_ROUND + (d_current_round - 1) * 20; */
+
+    if (d_current_round <= 7)
+        return TIME_PER_ROUND;
+    if (d_current_round <= 15)
+        return TIME_PER_ROUND + 250;
+    if (d_current_round <= 25)
+        return TIME_PER_ROUND + 500;
+
+    return TIME_PER_ROUND + 250;
 }
 
 minimax_two::minimax_two(const table_t &table,
@@ -124,7 +136,7 @@ minimax_two::minimax_two(const table_t &table,
 
 square_pos_t minimax_two::get_move() const {
     auto ret = minmax_ret_t{};
-    auto best_move = square_pos_t{};
+    auto best_ret = minmax_ret_t{};
     auto depth = STARTING_DEPTH;
     auto call_time = std::chrono::steady_clock::now();
     auto time_limit = get_time_limit();
@@ -134,15 +146,28 @@ square_pos_t minimax_two::get_move() const {
         // Keep in @best_move the last correct move.  This is only violated by
         // the first initialization, which *must* not be the last one; check out
         // the assert below.
-        best_move = ret.move;
+        best_ret = ret;
+
+        // If we already won or lost, no need to go further
+        if (ret.score == INF || ret.score == -INF || ret.score == DRAW_SCORE) {
+            if (ret.score == INF) {
+                TTT_DEBUG << "found out we will win" << std::endl;
+            } else if (ret.score == -INF) {
+                TTT_DEBUG << "found out we will lose" << std::endl;
+            } else {
+                TTT_DEBUG << "found out it will be a draw" << std::endl;
+            }
+
+            break;
+        }
 
         // Call main minimax procedure
         ret = negamax(
             d_table,      // Game configuration
             d_avail,      // Available moves
             player_e::ME, // Player to move
-            -INF,         // Alpha
-            INF,          // Beta
+            -INF - 1,     // Alpha
+            INF + 1,      // Beta
             depth,        // Depth
             call_time ,   // Time of call
             time_limit    // Time limit
@@ -155,10 +180,15 @@ square_pos_t minimax_two::get_move() const {
     // The meaning of this assert is that we *must not* get timeout on the first
     // call to the minimax procedure; aka the starting depth should be small
     // enough.
-    TTT_ASSERT(depth >= STARTING_DEPTH + 2, "minimax_two invariant");
+    if (ret.score != INF && ret.score != -INF && ret.score != DRAW_SCORE) {
+        TTT_ASSERT(depth >= STARTING_DEPTH + 2, "minimax_two invariant");
+    }
 
-    TTT_DEBUG << "the depth was " << depth << std::endl;
-    return best_move;
+    TTT_DEBUG << "depth: " << depth << "; "
+              << "score: " << best_ret.score
+              << std::endl;
+
+    return best_ret.move;
 }
 
 } // namespace tictactoe

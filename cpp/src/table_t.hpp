@@ -42,7 +42,7 @@ class table_t {
 
     player_e get_owner_of(square_pos_t pos) const;
     bool is_small_won_by(player_e player, big_pos_e pos) const;
-    bool is_small_almost_won_by(player_e player, big_pos_e pos) const;
+    int is_small_almost_won_by(player_e player, big_pos_e pos) const;
     bool is_small_playable(big_pos_e pos) const;
     bool can_win_small(player_e player, big_pos_e game) const;
 

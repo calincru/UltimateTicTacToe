@@ -9,6 +9,7 @@
 
 // C++
 #include <array>
+#include <unordered_map>
 
 namespace tictactoe {
 
@@ -25,12 +26,12 @@ class heuristic_two: public heuristic_base {
 
     // PRIVATE FUNCTIONS
     int score_available_moves() const;
-    int score_won_game(big_pos_e game, const game_types_arr &games) const;
-    int score_almost_won_game(big_pos_e game, const game_types_arr &gms) const;
-    int score_undecided_game(big_pos_e game, const game_types_arr &gms) const;
-    int score_cannot_win_game(big_pos_e game, const game_types_arr &gms) const;
+    int score_won_game(big_pos_e game) const;
+    int score_almost_won_game(big_pos_e game) const;
+    int score_undecided_game(big_pos_e game) const;
+    int score_cannot_win_game(big_pos_e game) const;
 
-    game_types_arr classify_games() const;
+    int score_and_classify_games(game_types_arr &games) const;
     int score_games_in_line(big_pos_e game1,
                             big_pos_e game2,
                             big_pos_e game3,

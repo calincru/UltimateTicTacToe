@@ -128,7 +128,7 @@ bool table_t::is_small_won_by(player_e player, big_pos_e pos) const {
                                   : d_his.find(pos) != d_his.end();
 }
 
-bool table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
+int table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
     TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
                "is_small_almost_won_by precondition");
 
@@ -141,44 +141,44 @@ bool table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
     };
 
         // Upper row
-    return score(d_board.at({pos, small_pos_e::UL}),
-                 d_board.at({pos, small_pos_e::UM}),
-                 d_board.at({pos, small_pos_e::UR})) == 2
+    return (score(d_board.at({pos, small_pos_e::UL}),
+                  d_board.at({pos, small_pos_e::UM}),
+                  d_board.at({pos, small_pos_e::UR})) == 2)
 
         // Middle row
-        || score(d_board.at({pos, small_pos_e::ML}),
+        + (score(d_board.at({pos, small_pos_e::ML}),
                  d_board.at({pos, small_pos_e::MM}),
-                 d_board.at({pos, small_pos_e::MR})) == 2
+                 d_board.at({pos, small_pos_e::MR})) == 2)
 
         // Lower row
-        || score(d_board.at({pos, small_pos_e::LL}),
+        + (score(d_board.at({pos, small_pos_e::LL}),
                  d_board.at({pos, small_pos_e::LM}),
-                 d_board.at({pos, small_pos_e::LR})) == 2
+                 d_board.at({pos, small_pos_e::LR})) == 2)
 
         // Left column
-        || score(d_board.at({pos, small_pos_e::UL}),
+        + (score(d_board.at({pos, small_pos_e::UL}),
                  d_board.at({pos, small_pos_e::ML}),
-                 d_board.at({pos, small_pos_e::LL})) == 2
+                 d_board.at({pos, small_pos_e::LL})) == 2)
 
         // Middle column
-        || score(d_board.at({pos, small_pos_e::UM}),
+        + (score(d_board.at({pos, small_pos_e::UM}),
                  d_board.at({pos, small_pos_e::MM}),
-                 d_board.at({pos, small_pos_e::LM})) == 2
+                 d_board.at({pos, small_pos_e::LM})) == 2)
 
         // Right column
-        || score(d_board.at({pos, small_pos_e::UR}),
+        + (score(d_board.at({pos, small_pos_e::UR}),
                  d_board.at({pos, small_pos_e::MR}),
-                 d_board.at({pos, small_pos_e::LR})) == 2
+                 d_board.at({pos, small_pos_e::LR})) == 2)
 
         // UL - LR diagonal
-        || score(d_board.at({pos, small_pos_e::UL}),
+        + (score(d_board.at({pos, small_pos_e::UL}),
                  d_board.at({pos, small_pos_e::MM}),
-                 d_board.at({pos, small_pos_e::LR})) == 2
+                 d_board.at({pos, small_pos_e::LR})) == 2)
 
         // UR - LL diagonal
-        || score(d_board.at({pos, small_pos_e::UR}),
+        + (score(d_board.at({pos, small_pos_e::UR}),
                  d_board.at({pos, small_pos_e::MM}),
-                 d_board.at({pos, small_pos_e::LL})) == 2;
+                 d_board.at({pos, small_pos_e::LL})) == 2);
 }
 
 bool table_t::is_small_playable(big_pos_e pos) const {
