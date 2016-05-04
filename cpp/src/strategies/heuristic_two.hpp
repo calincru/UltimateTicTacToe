@@ -38,7 +38,9 @@ class heuristic_two: public heuristic_base {
 
   public:
     // CREATORS
-    heuristic_two(const table_t &table, player_e player);
+    heuristic_two(const table_t &table,
+                  const std::vector<big_pos_e> &avail,
+                  player_e player);
 
     // OVERRIDEN METHODS
     virtual int evaluate() const override;

@@ -35,8 +35,10 @@ static std::pair<int, square_pos_t> negamax(table_t table,
     }
 
     if (depth == MAX_DEPTH) {
-        auto my_score = heuristic_one{table, player}.evaluate();
-        auto his_score = heuristic_one{table, opponent}.evaluate();
+        auto my_score = heuristic_one{table, avail, player}.evaluate();
+        auto opponent_avail_moves = std::vector<big_pos_e>{};
+        auto his_score
+            = heuristic_one{table, opponent_avail_moves, opponent}.evaluate();
 
         alpha = my_score - his_score;
         goto _exit;

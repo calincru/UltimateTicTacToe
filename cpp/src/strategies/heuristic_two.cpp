@@ -19,7 +19,13 @@ namespace {
     static constexpr auto WON_FACTOR = 1000;
     static constexpr auto ALMOST_WON_FACTOR = 100;
     static constexpr auto UNDECIDED_FACTOR = 10;
+
+    static constexpr auto ANY_MOVE_BONUS = WON_FACTOR - 1;
 } // namespace {
+
+int heuristic_two::score_available_moves() const {
+    return d_avail.size() > 1 ? ANY_MOVE_BONUS : 0;
+}
 
 int heuristic_two::score_won_game(big_pos_e game) const {
     UNUSED(game);
@@ -127,8 +133,10 @@ int heuristic_two::score_games_in_line(big_pos_e game1,
     return cannot_win > 0 ? 0 : won * WON_BONUS;
 }
 
-heuristic_two::heuristic_two(const table_t &table, player_e player)
-    : heuristic_base{table, player} {
+heuristic_two::heuristic_two(const table_t &table,
+                             const std::vector<big_pos_e> &avail,
+                             player_e player)
+    : heuristic_base{table, avail, player} {
     // Nothing to do
 }
 
@@ -168,7 +176,7 @@ int heuristic_two::evaluate() const {
                 games
             );
 
-    return score;
+    return score + score_available_moves();
 }
 
 } // namespace tictactoe

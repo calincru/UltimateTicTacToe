@@ -62,8 +62,10 @@ static minmax_ret_t negamax(table_t table,
 
     // Check if we reached the maximum depth
     if (depth == 0) {
-        auto my_score = heuristic_two{table, player}.evaluate();
-        auto his_score = heuristic_two{table, opponent}.evaluate();
+        auto my_score = heuristic_two{table, avail, player}.evaluate();
+        auto opponent_avail_moves = std::vector<big_pos_e>{};
+        auto his_score
+            = heuristic_two{table, opponent_avail_moves, opponent}.evaluate();
 
         alpha = my_score - his_score;
         goto return_score;
