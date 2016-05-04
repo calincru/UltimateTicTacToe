@@ -14,76 +14,17 @@
 namespace tictactoe {
 namespace {
     // STATIC DATA
+    static constexpr auto WON_BONUS = 10000;
+
     static constexpr auto WON_FACTOR = 1000;
     static constexpr auto ALMOST_WON_FACTOR = 100;
     static constexpr auto UNDECIDED_FACTOR = 10;
-    static constexpr auto CANNOT_WIN_FACTOR = -10;
 } // namespace {
 
-///
-// Returns WON_FACTOR or less, depending on the position of this small game
-// inside the big game.
-///
 int heuristic_two::score_won_game(big_pos_e game) const {
-    int num = 1;
-    int denom = 1;
+    UNUSED(game);
 
-    switch (game) {
-        ///
-        //      Left|Mid|Right
-        //      =============
-        // Upper|   | x |   |
-        //      -------------
-        // Mid  | x |   | x |
-        //      -------------
-        // Lower|   | x |   |
-        //      =============
-        //
-        // The score assigned is a little bit over 1/2 so that two such games
-        // won on the same line/column are more valuable than winning the middle
-        // one.
-        ///
-        case big_pos_e::UM:
-        case big_pos_e::ML:
-        case big_pos_e::MR:
-        case big_pos_e::LM:
-            num = 11;
-            denom = 20;
-            break;
-
-        ///
-        //      Left|Mid|Right
-        //      =============
-        // Upper| x |   | x |
-        //      -------------
-        // Mid  |   |   |   |
-        //      -------------
-        // Lower| x |   | x |
-        //      =============
-        ///
-        case big_pos_e::UL:
-        case big_pos_e::UR:
-        case big_pos_e::LL:
-        case big_pos_e::LR:
-            num = 4;
-            denom = 5;
-
-        ///
-        //      Left|Mid|Right
-        //      =============
-        // Upper|   |   |   |
-        //      -------------
-        // Mid  |   | x |   |
-        //      -------------
-        // Lower|   |   |   |
-        //      =============
-        ///
-        case big_pos_e::MM:
-            num = 1;
-            denom = 1;
-    }
-
-    return num * WON_FACTOR / denom;
+    return WON_FACTOR;
 }
 
 ///
@@ -117,15 +58,6 @@ int heuristic_two::score_undecided_game(big_pos_e game) const {
     return UNDECIDED_FACTOR + (mines - his) * UNDECIDED_FACTOR / denom;
 }
 
-///
-// FIXME Same as "score_almost_won_game".
-///
-int heuristic_two::score_cannot_win_game(big_pos_e game) const {
-    UNUSED(game);
-
-    return CANNOT_WIN_FACTOR;
-}
-
 int heuristic_two::score_and_classify_games(game_types_arr &games) const {
     auto score = 0;
 
@@ -154,12 +86,11 @@ int heuristic_two::score_and_classify_games(game_types_arr &games) const {
         //      =============
         //
         } else if ((almost_ret =
-                        d_table.is_small_almost_won_by(d_player, game)) > 0) {
+                        d_table.count_almost_won_by(d_player, game)) > 0) {
             score += almost_ret * score_almost_won_game(game);
             games[ALMOST_WON].emplace(game);
 
         } else if (!d_table.can_win_small(d_player, game)) {
-            score += score_cannot_win_game(game);
             games[CANNOT_WIN].emplace(game);
 
         } else {
@@ -179,18 +110,13 @@ int heuristic_two::score_games_in_line(big_pos_e game1,
                                        big_pos_e game3,
                                        const game_types_arr &games) const {
     int won = 0;
-    int almost_won = 0;
-    int lost = 0;
     int cannot_win = 0;
 
     auto count_f = [&](big_pos_e game) {
         if (SET_CONTAINS(games[WON], game)) {
             ++won;
-        } else if (SET_CONTAINS(games[ALMOST_WON], game)) {
-            ++almost_won;
-        } else if (SET_CONTAINS(games[LOST], game)) {
-            ++lost;
-        } else if (SET_CONTAINS(games[CANNOT_WIN], game)) {
+        } else if (SET_CONTAINS(games[LOST], game)
+                   || SET_CONTAINS(games[CANNOT_WIN], game)) {
             ++cannot_win;
         }
     };
@@ -198,29 +124,11 @@ int heuristic_two::score_games_in_line(big_pos_e game1,
     count_f(game2);
     count_f(game3);
 
-    auto endorsement = 0;
-
-    if (lost > 0) {
-        if (won == 0) {
-            endorsement = -lost - 1;
-        } else {
-            endorsement = -lost;
-        }
-    } else if (won > 0 && cannot_win == 0) {
-        if (almost_won > 0) {
-            endorsement = won + 1;
-        } else {
-            endorsement = won;
-        }
-    }
-
-    return endorsement * WON_FACTOR;
+    return cannot_win > 0 ? 0 : won * WON_BONUS;
 }
 
-heuristic_two::heuristic_two(const table_t &table,
-                             const std::vector<big_pos_e> &avail,
-                             player_e player)
-    : heuristic_base{table, avail, player} {
+heuristic_two::heuristic_two(const table_t &table, player_e player)
+    : heuristic_base{table, player} {
     // Nothing to do
 }
 

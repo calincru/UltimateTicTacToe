@@ -17,10 +17,6 @@ namespace {
     static constexpr auto CANNOT_WIN_FACTOR = 10;
 } // namespace {
 
-int heuristic_one::score_available_moves() const {
-    return d_avail.size() > 1 ? ANY_MOVE_TERM : 0;
-}
-
 int heuristic_one::score_won_game(big_pos_e game,
                                   const game_types_arr &games) const {
     // FIXME
@@ -67,7 +63,7 @@ auto heuristic_one::classify_games() const -> game_types_arr {
             games[WON].emplace(game);
         } else if (d_table.is_small_won_by(d_opponent, game)) {
             games[LOST].emplace(game);
-        } else if (d_table.is_small_almost_won_by(d_player, game)) {
+        } else if (d_table.count_almost_won_by(d_player, game)) {
             games[ALMOST_WON].emplace(game);
         } else if (!d_table.can_win_small(d_player, game)) {
             games[CANNOT_WIN].emplace(game);
@@ -106,16 +102,11 @@ int heuristic_one::score_games_in_line(big_pos_e game1,
         return score;
     };
 
-    return score_available_moves()
-         + score_game(game1)
-         + score_game(game2)
-         + score_game(game3);
+    return score_game(game1) + score_game(game2) + score_game(game3);
 }
 
-heuristic_one::heuristic_one(const table_t &table,
-                             const std::vector<big_pos_e> &avail,
-                             player_e player)
-    : heuristic_base{table, avail, player} {
+heuristic_one::heuristic_one(const table_t &table, player_e player)
+    : heuristic_base{table, player} {
     // Nothing to do
 }
 

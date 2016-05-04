@@ -19,26 +19,24 @@ static std::pair<int, square_pos_t> negamax(table_t table,
                                             player_e player,
                                             int alpha, int beta, int depth) {
     auto opponent = player_utils::opponent(player);
-    auto finished = table.is_finished();
+    auto winner = table.get_winner();
     auto best_move = square_pos_t{};
 
-    if (finished.first) {
-        if (finished.second == player) {
+    if (winner != player_e::NONE) {
+        if (winner == player) {
             alpha = INF;
-        } else if (finished.second == opponent) {
-            alpha = -INF;
         } else {
-            alpha = 0;
+            alpha = -INF;
         }
-
+        goto _exit;
+    } else if (avail.size() == 0) {
+        alpha = 0;
         goto _exit;
     }
 
     if (depth == MAX_DEPTH) {
-        auto my_score = heuristic_one{table, avail, player}.evaluate();
-        auto opponent_avail_moves = std::vector<big_pos_e>{};
-        auto his_score
-            = heuristic_one{table, opponent_avail_moves, opponent}.evaluate();
+        auto my_score = heuristic_one{table, player}.evaluate();
+        auto his_score = heuristic_one{table, opponent}.evaluate();
 
         alpha = my_score - his_score;
         goto _exit;

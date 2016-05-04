@@ -24,7 +24,6 @@ class heuristic_one: public heuristic_base {
     using game_types_arr = std::array<table_t::big_pos_set_t, 5>;
 
     // PRIVATE FUNCTIONS
-    int score_available_moves() const;
     int score_won_game(big_pos_e game, const game_types_arr &games) const;
     int score_almost_won_game(big_pos_e game, const game_types_arr &gms) const;
     int score_undecided_game(big_pos_e game, const game_types_arr &gms) const;
@@ -38,9 +37,7 @@ class heuristic_one: public heuristic_base {
 
   public:
     // CREATORS
-    heuristic_one(const table_t &table,
-                  const std::vector<big_pos_e> &avail,
-                  player_e player);
+    heuristic_one(const table_t &table, player_e player);
 
     // OVERRIDEN METHODS
     virtual int evaluate() const override;

@@ -50,10 +50,6 @@ bool table_t::check_game_won_by(player_e player) const {
             is_small_won_by(player, big_pos_e::LL));
 };
 
-bool table_t::check_game_is_draw() const {
-    return d_mines.size() + d_his.size() == 9;
-}
-
 bool table_t::check_small_won_by(player_e player, big_pos_e pos) const {
         // Upper row
     return (d_board.at({pos, small_pos_e::UL}) == player &&
@@ -106,29 +102,22 @@ table_t::table_t()
     }
 }
 
-std::pair<bool, player_e> table_t::is_finished() const {
+player_e table_t::get_winner() const {
     if (check_game_won_by(player_e::ME)) {
-        return {true, player_e::ME};
+        return player_e::ME;
     }
     if (check_game_won_by(player_e::OPPONENT)) {
-        return {true, player_e::OPPONENT};
+        return player_e::OPPONENT;
     }
 
-    return {check_game_is_draw(), player_e::NONE};
+    return player_e::NONE;
 }
 
 player_e table_t::get_owner_of(square_pos_t pos) const {
     return d_board.at(pos);
 }
 
-bool table_t::is_small_won_by(player_e player, big_pos_e pos) const {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
-               "is_small_won_by precondition");
-    return player == player_e::ME ? d_mines.find(pos) != d_mines.end()
-                                  : d_his.find(pos) != d_his.end();
-}
-
-int table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
+int table_t::count_almost_won_by(player_e player, big_pos_e pos) const {
     TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
                "is_small_almost_won_by precondition");
 
@@ -181,9 +170,30 @@ int table_t::is_small_almost_won_by(player_e player, big_pos_e pos) const {
                  d_board.at({pos, small_pos_e::LL})) == 2);
 }
 
-bool table_t::is_small_playable(big_pos_e pos) const {
-    return !is_small_won_by(player_e::ME, pos)
-        && !is_small_won_by(player_e::OPPONENT, pos);
+bool table_t::is_small_won_by(player_e player, big_pos_e pos) const {
+    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
+               "is_small_won_by precondition");
+    return player == player_e::ME ? d_mines.find(pos) != d_mines.end()
+                                  : d_his.find(pos) != d_his.end();
+}
+
+bool table_t::is_small_playable(big_pos_e game) const {
+    // Check if the game was won by one of the players
+    if (is_small_won_by(player_e::ME, game)
+        || is_small_won_by(player_e::OPPONENT, game))
+        return false;
+
+
+    // Check if it is a draw
+    for (int i = 0; i < 9; ++i) {
+        auto small_pos = square_pos_utils::coord_to_small_pos(i);
+
+        if (get_owner_of({game, small_pos}) == player_e::NONE) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool table_t::can_win_small(player_e player, big_pos_e game) const {
@@ -227,40 +237,6 @@ bool table_t::can_win_small(player_e player, big_pos_e game) const {
         || (d_board.at({game, small_pos_e::UR}) != opponent &&
             d_board.at({game, small_pos_e::MM}) != opponent &&
             d_board.at({game, small_pos_e::LL}) != opponent);
-}
-
-auto table_t::get_smalls_won_by(player_e player) const -> big_pos_set_t {
-    TTT_ASSERT(player == player_e::ME || player == player_e::OPPONENT,
-               "get_smalls_won_by precondition");
-    return player == player_e::ME ? d_mines : d_his;
-}
-
-auto table_t::get_smalls_playable() const -> big_pos_set_t {
-    auto playable = big_pos_set_t{};
-
-    for (auto i = 0; i < 9; ++i) {
-        auto pos = square_pos_utils::coord_to_big_pos(i);
-
-        if (is_small_playable(pos)) {
-            playable.emplace(pos);
-        }
-    }
-
-    return playable;
-}
-
-auto table_t::get_smalls_almost_won_by(player_e player) const -> big_pos_set_t {
-    auto almost_won = big_pos_set_t{};
-
-    for (auto i = 0; i < 9; ++i) {
-        auto pos = square_pos_utils::coord_to_big_pos(i);
-
-        if (is_small_almost_won_by(player, pos)) {
-            almost_won.emplace(pos);
-        }
-    }
-
-    return almost_won;
 }
 
 std::vector<small_pos_e> table_t::get_avail_moves_in(big_pos_e big) const {

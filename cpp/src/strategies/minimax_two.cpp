@@ -9,6 +9,7 @@
 
 // C++
 #include <chrono>
+#include <cstdlib>
 
 namespace tictactoe {
 namespace {
@@ -32,7 +33,7 @@ static minmax_ret_t negamax(table_t table,
                             int alpha, int beta, int depth,
                             steady_clock_tp start_time, int time_limit) {
     auto opponent = player_utils::opponent(player);
-    auto finished = table.is_finished();
+    auto winner= table.get_winner();
     auto best_move = square_pos_t{};
 
     // Check if we still have time
@@ -44,25 +45,25 @@ static minmax_ret_t negamax(table_t table,
         goto timeout;
     }
 
-    // Check if the game is finished
-    if (finished.first) {
-        if (finished.second == player) {
+    // Check if the game is won by one of the players
+    if (winner != player_e::NONE) {
+        if (winner == player) {
             alpha = INF;
-        } else if (finished.second == opponent) {
-            alpha = -INF;
         } else {
-            alpha = DRAW_SCORE;
+            alpha = -INF;
         }
+        goto return_score;
 
+    // Check if the game is a draw
+    } else if (avail.size() == 0) {
+        alpha = DRAW_SCORE;
         goto return_score;
     }
 
     // Check if we reached the maximum depth
     if (depth == 0) {
-        auto my_score = heuristic_two{table, avail, player}.evaluate();
-        auto opponent_avail_moves = std::vector<big_pos_e>{};
-        auto his_score
-            = heuristic_two{table, opponent_avail_moves, opponent}.evaluate();
+        auto my_score = heuristic_two{table, player}.evaluate();
+        auto his_score = heuristic_two{table, opponent}.evaluate();
 
         alpha = my_score - his_score;
         goto return_score;
@@ -149,7 +150,10 @@ square_pos_t minimax_two::get_move() const {
         best_ret = ret;
 
         // If we already won or lost, no need to go further
-        if (ret.score == INF || ret.score == -INF || ret.score == DRAW_SCORE) {
+        if (ret.score == INF
+            || ret.score == -INF
+            || std::abs(ret.score) == DRAW_SCORE) {
+
             if (ret.score == INF) {
                 TTT_DEBUG << "found out we will win" << std::endl;
             } else if (ret.score == -INF) {
@@ -180,7 +184,9 @@ square_pos_t minimax_two::get_move() const {
     // The meaning of this assert is that we *must not* get timeout on the first
     // call to the minimax procedure; aka the starting depth should be small
     // enough.
-    if (ret.score != INF && ret.score != -INF && ret.score != DRAW_SCORE) {
+    if (ret.score != INF
+        && ret.score != -INF
+        && std::abs(ret.score) != DRAW_SCORE) {
         TTT_ASSERT(depth >= STARTING_DEPTH + 2, "minimax_two invariant");
     }
 

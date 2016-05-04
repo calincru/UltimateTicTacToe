@@ -14,15 +14,12 @@ namespace tictactoe {
 class heuristic_base {
   protected:
     const table_t &d_table;
-    const std::vector<big_pos_e> &d_avail;
     player_e d_player;
     player_e d_opponent;
 
   public:
     // CREATORS
-    heuristic_base(const table_t &table, 
-                   const std::vector<big_pos_e> &avail,
-                   player_e player);
+    heuristic_base(const table_t &table, player_e player);
     virtual ~heuristic_base() = default;
 
     // VIRTUAL METHODS

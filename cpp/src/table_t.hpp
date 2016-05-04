@@ -30,7 +30,6 @@ class table_t {
 
     // PRIVATE FUNCTIONS
     bool check_game_won_by(player_e player) const;
-    bool check_game_is_draw() const;
     bool check_small_won_by(player_e player, big_pos_e pos) const;
 
   public:
@@ -38,17 +37,13 @@ class table_t {
     table_t();
 
     // ACCESSORS
-    std::pair<bool, player_e> is_finished() const;
+    player_e get_winner() const;
 
     player_e get_owner_of(square_pos_t pos) const;
+    int count_almost_won_by(player_e player, big_pos_e pos) const;
     bool is_small_won_by(player_e player, big_pos_e pos) const;
-    int is_small_almost_won_by(player_e player, big_pos_e pos) const;
     bool is_small_playable(big_pos_e pos) const;
     bool can_win_small(player_e player, big_pos_e game) const;
-
-    big_pos_set_t get_smalls_won_by(player_e player) const;
-    big_pos_set_t get_smalls_almost_won_by(player_e player) const;
-    big_pos_set_t get_smalls_playable() const;
 
     std::vector<small_pos_e> get_avail_moves_in(big_pos_e big) const;
     std::vector<big_pos_e> get_next_available(big_pos_e pos) const;
